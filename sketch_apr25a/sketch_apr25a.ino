@@ -1,9 +1,10 @@
 #define LED_R 3       // R의 핀 번호 3
 #define LED_Y 4       // Y의 핀 번호 4
 #define LED_G 5       // G의 핀 번호 5
-#define def_dis 11
+#define def_dis 9
 #define second 1000
 
+String street_name = "jungwang_light";
 int r_time = 3;
 int y_time = 1;
 int g_time = 5;
@@ -22,16 +23,24 @@ void setup() {
 }
  
 void loop() {
+  
   measureDis();
+  //Serial.println(distance);
+  //Serial.print("count ");
+  //Serial.println(count);
   light_time = control_time_light(light_time, r_time, y_time, g_time);
   if (time2 == 60) {
+    Serial.println("name "+street_name);
+    Serial.print("count ");
+    Serial.println(count);
+    
     time2 = -1;
     g_time = set_g_time(count);
     count = 0;
+   
   }
   light_time += 1;
   time2 += 1;
-  Serial.println(time2);
   delay(second);
 }
 
@@ -61,7 +70,7 @@ void turnOffAll() {              // turnOffAll 함수 정의
 }
 
 int set_g_time(int count){
-  int temp_g_time = 5 + count / 3;
+  int temp_g_time = 5 + count;
   if (temp_g_time > 10){
     return 10;
   }
@@ -75,14 +84,13 @@ void measureDis() {
 
     distance = (27.61 / (volt - 0.1696)) * 1000; 
 
-    Serial.println(distance);
-    Serial.println(count);
-
     counter(distance);
+    //Serial.println(distance);
+
 }
 
 void counter(int dis) {
-  if (dis != def_dis){
+  if (dis != def_dis && dis != def_dis -1){
     person = true;
   }
   else{
