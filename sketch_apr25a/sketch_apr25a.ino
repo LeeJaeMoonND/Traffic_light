@@ -6,20 +6,23 @@
 #define LED_DOWN_Y 7       // Y의 핀 번호 7
 #define LED_DOWN_G 8       // G의 핀 번호 8
 
-#define LED_CAR_R 9       // R의 핀 번호 6
-#define LED_CAR_Y 10       // Y의 핀 번호 7
-#define LED_CAR_G 11      // G의 핀 번호 8
+#define LED_CAR_R 9       // R의 핀 번호 9
+#define LED_CAR_Y 10       // Y의 핀 번호 10
+#define LED_CAR_G 11      // G의 핀 번호 11
 
-#define def_dis 9
+#define def_dis 21
 #define second 1000
 
 String street_name = "jungwang_light";
 int r_time = 3;
 int y_time = 1;
 int g_time = 5;
-int distance = 0; //Cm로 계산된 거리값을 저장해두기위해 변수를 선언합니다.
+int distance_1 = 0; //Cm로 계산된 거리값을 저장해두기위해 변수를 선언합니다.
+int distance_2 = 0;
 int count = 0;
-bool person = false;
+bool person_1 = false;
+bool person_2 = false;
+
 int light_time = 0;
 int time2 = 0;
 
@@ -38,19 +41,23 @@ void setup() {
 }
  
 void loop() {
-  
-  measureDis(1); // 밑 거리 측정
-  Serial.println(distance);
+
+  Serial.print("port 0 ");
+  Serial.println(distance_1);
+  Serial.print("port 1 ");
+  Serial.println(distance_2);
+
+  measureDis();
+ 
 
 
   //Serial.print("count ");
   //Serial.println(count);
   light_time = control_time_light(light_time, r_time, y_time, g_time);
-  if (time2 == 60) {
+  if (time2 == 10) {
     Serial.println("name "+street_name);
     Serial.print("count ");
     Serial.println(count);
-    
     time2 = -1;
     g_time = set_g_time(count);
     count = 0;
@@ -109,31 +116,39 @@ int set_g_time(int count){
   }
 }
 
-void measureDis(int port) {
-    if (port = 0){
-      int volt = map(analogRead(A0), 0, 1023, 0, 5000);
-      distance = (27.61 / (volt - 0.1696)) * 1000; 
+void measureDis() {
+  int volt = map(analogRead(A0), 0, 1023, 0, 5000);
+  distance_1 = (27.61 / (volt - 0.1696)) * 1000; 
 
-      counter(distance);
-    }
-    else if(port = 1){
-      int volt = map(analogRead(A1), 0, 1023, 0, 5000);
-      distance = (27.61 / (volt - 0.1696)) * 1000; 
+  counter(distance_1 , 1);
+  
+  volt = map(analogRead(A1), 0, 1023, 0, 5000);
+  distance_2 = (27.61 / (volt - 0.1696)) * 1000; 
 
-      counter(distance);
-    }
-    //Serial.println(distance);
-
+  counter(distance_2, 2);
 }
 
-void counter(int dis) {
-  if (dis != def_dis && dis != def_dis -1){
-    person = true;
+void counter(int dis, int port) {
+  if (dis < def_dis){
+    if (port == 1){
+      person_1 = true;
+    }
+    else {
+      person_2 = true;
+    }
   }
   else{
-    if (person == true){
-      count += 1;
-      person = false;
+    if (port == 1){
+      if (person_1 == true){
+        count += 1;
+        person_1 = false;
+      }
+    }
+    else{
+      if (person_2 == true){
+        count += 1;
+        person_2 = false;
+     }
     }
   }
 }

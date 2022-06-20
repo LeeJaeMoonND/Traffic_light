@@ -10,6 +10,7 @@ class count_db:
         self.cur = self.conn.cursor()
 
     def insert_traffic_count(self, name, count, date, time):
+        count = count / 2
         
         self.cur.execute("INSERT INTO traffic_count VALUES('{0}',{1}, '{2}', '{3}')".format(name, count, date, time))
         self.conn.commit()
